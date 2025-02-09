@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.andromeda.muteq.DTO.ItemDTO;
 import com.andromeda.muteq.Service.ItemService;
 import com.andromeda.muteq.Util.Constants;
+import com.andromeda.muteq.Util.DefaultResponse;
+import com.andromeda.muteq.Util.ElementsResponse;
 
 import java.util.Set;
 
@@ -28,22 +30,27 @@ public class ItemController {
     private ItemService itemService;
 
     @GetMapping
-    public ResponseEntity<Set<ItemDTO>> getAllItems(
-            @RequestParam(name = "page", defaultValue = "0") Integer page,
-            @RequestParam(name = "size", defaultValue = "10") Integer size) {
+    public ResponseEntity<DefaultResponse<ElementsResponse<ItemDTO>>> getAllItems(
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
         Pageable pageable = PageRequest.of(page, size > Constants.MAX_PAGE_SIZE ? Constants.MAX_PAGE_SIZE : size);
         Set<ItemDTO> items = itemService.getAllItems(pageable);
-        return ResponseEntity.ok(items);
+
+        DefaultResponse<ElementsResponse<ItemDTO>> res = new DefaultResponse<ElementsResponse<ItemDTO>>(
+            new ElementsResponse<ItemDTO>(items, itemService.count())
+        );
+        
+        return ResponseEntity.ok(res);
     }
 
     // @GetMapping
     // public ResponseEntity<Set<ItemDTO>> getItemsByName(
-    // @RequestParam(name = "name", defaultValue = " ") String name,
-    // @RequestParam(name = "page", defaultValue = "0") Integer page,
-    // @RequestParam(name = "size", defaultValue = "10") Integer size) {
-    // Pageable pageable = PageRequest.of(page, size);
-    // Set<ItemDTO> items = itemService.getItemsByName(name, pageable);
-    // return ResponseEntity.ok(items);
+    //         @RequestParam(defaultValue = " ") String name,
+    //         @RequestParam(defaultValue = "0") Integer page,
+    //         @RequestParam(defaultValue = "10") Integer size) {
+    //     Pageable pageable = PageRequest.of(page, size);
+    //     Set<ItemDTO> items = itemService.getItemsByName(name, pageable);
+    //     return ResponseEntity.ok(items);
     // }
 
     @GetMapping("/{id}")

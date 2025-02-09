@@ -64,4 +64,8 @@ public class ItemService {
         Item item = repository.findById(id).orElseThrow(() -> new RuntimeException("Item not found"));
         repository.delete(item);
     }
+
+    public Long count() {
+        return repository.count();
+    }
 }
