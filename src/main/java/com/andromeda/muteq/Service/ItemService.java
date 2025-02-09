@@ -4,7 +4,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import com.andromeda.muteq.DTO.ItemDTO;
@@ -25,7 +26,9 @@ public class ItemService {
     }
 
     public Set<ItemDTO> getAllItems(Pageable page) {
-        return repository.findAll().stream()
+        Page<Item> pageUser = repository.findAll(page);
+
+        return pageUser.stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toSet());
     }

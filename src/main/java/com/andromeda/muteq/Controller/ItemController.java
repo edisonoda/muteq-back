@@ -8,7 +8,8 @@ import com.andromeda.muteq.Service.ItemService;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,19 +30,19 @@ public class ItemController {
     public ResponseEntity<Set<ItemDTO>> getAllItems(
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "size", defaultValue = "10") Integer size) {
-        // Pageable pageable = PageRequest.of(page, size);
-        Set<ItemDTO> items = itemService.getAllItems(new Pageable());
+        Pageable pageable = PageRequest.of(page, size);
+        Set<ItemDTO> items = itemService.getAllItems(pageable);
         return ResponseEntity.ok(items);
     }
 
     // @GetMapping
     // public ResponseEntity<Set<ItemDTO>> getItemsByName(
-    //         @RequestParam(name = "name", defaultValue = " ") String name,
-    //         @RequestParam(name = "page", defaultValue = "0") Integer page,
-    //         @RequestParam(name = "size", defaultValue = "10") Integer size) {
-    //     // Pageable pageable = PageRequest.of(page, size);
-    //     Set<ItemDTO> items = itemService.getItemsByName(name, new Pageable());
-    //     return ResponseEntity.ok(items);
+    // @RequestParam(name = "name", defaultValue = " ") String name,
+    // @RequestParam(name = "page", defaultValue = "0") Integer page,
+    // @RequestParam(name = "size", defaultValue = "10") Integer size) {
+    // Pageable pageable = PageRequest.of(page, size);
+    // Set<ItemDTO> items = itemService.getItemsByName(name, pageable);
+    // return ResponseEntity.ok(items);
     // }
 
     @GetMapping("/{id}")
