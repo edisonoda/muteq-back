@@ -5,6 +5,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -38,11 +40,19 @@ public class ItemService {
         return mapToDTO(item);
     }
 
-    // public Set<ItemDTO> getItemsByName(String name, Pageable page) {
-    //     return repository.findItemsByName(name, page).stream()
-    //             .map(this::mapToDTO)
-    //             .collect(Collectors.toSet());
-    // }
+    public Set<ItemDTO> getItemsByName(String name, Pageable page) {
+        Item item = new Item();
+        item.setName(name);
+
+        ExampleMatcher matcher = ExampleMatcher.matching()
+            .withIgnoreCase()
+            .withIgnorePaths("content")
+            .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
+        
+        return repository.findAll(Example.of(item, matcher), page).stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toSet());
+    }
 
     public ItemDTO createItem(ItemDTO itemDTO) {
         Item item = mapToEntity(itemDTO);

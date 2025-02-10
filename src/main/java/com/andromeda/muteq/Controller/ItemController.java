@@ -43,15 +43,16 @@ public class ItemController {
         return ResponseEntity.ok(res);
     }
 
-    // @GetMapping
-    // public ResponseEntity<Set<ItemDTO>> getItemsByName(
-    //         @RequestParam(defaultValue = " ") String name,
-    //         @RequestParam(defaultValue = "0") Integer page,
-    //         @RequestParam(defaultValue = "10") Integer size) {
-    //     Pageable pageable = PageRequest.of(page, size);
-    //     Set<ItemDTO> items = itemService.getItemsByName(name, pageable);
-    //     return ResponseEntity.ok(items);
-    // }
+    @GetMapping("/search/{name}")
+    public ResponseEntity<Set<ItemDTO>> getItemsByName(
+            @PathVariable String name,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Set<ItemDTO> items = itemService.getItemsByName(name, pageable);
+
+        return ResponseEntity.ok(items);
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<ItemDTO> getItemById(@PathVariable Long id) {

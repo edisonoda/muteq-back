@@ -6,5 +6,5 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.andromeda.muteq.Entity.User;
 
 public interface UserRepository extends JpaRepository<User, String> {
-    UserDetails findByEmail(String email);
+    public UserDetails findByEmail(String email);
 }
