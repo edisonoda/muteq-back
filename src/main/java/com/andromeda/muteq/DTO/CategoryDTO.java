@@ -1,13 +1,12 @@
 package com.andromeda.muteq.DTO;
 
-public record ItemDTO(
+import java.util.Set;
+
+public record CategoryDTO(
     Long id,
     String name,
-    String manufacturer,
     String description,
-    Integer year,
     Long image_id,
     String image,
-    CategoryDTO category,
-    SectionDTO section
+    Set<ItemDTO> items
 ) { }

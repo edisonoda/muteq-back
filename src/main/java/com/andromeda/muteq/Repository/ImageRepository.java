@@ -6,4 +6,5 @@ import com.andromeda.muteq.Entity.Image;
 
 public interface ImageRepository extends JpaRepository<Image, Long> {
     public Image findByName(String name);
+    public Image findByPath(String path);
 }

@@ -11,13 +11,17 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name = "item")
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,12 +50,4 @@ public class Item {
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JoinColumn(name = "section_id", nullable = true)
     private Section section;
-
-    public Item() {}
-    public Item(String name, String manufacturer, String description, Integer year) {
-        this.name = name;
-        this.manufacturer = manufacturer;
-        this.description = description;
-        this.year = year;
-    }
 }
