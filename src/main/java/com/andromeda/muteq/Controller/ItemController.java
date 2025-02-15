@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.andromeda.muteq.DTO.ItemDTO;
 import com.andromeda.muteq.Service.ItemService;
 import com.andromeda.muteq.Util.Constants;
-import com.andromeda.muteq.Util.DefaultResponse;
 import com.andromeda.muteq.Util.ElementsResponse;
 
 import java.util.Set;
@@ -30,15 +29,13 @@ public class ItemController {
     private ItemService itemService;
 
     @GetMapping
-    public ResponseEntity<DefaultResponse<ElementsResponse<ItemDTO>>> getAllItems(
+    public ResponseEntity<ElementsResponse<ItemDTO>> getAllItems(
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "10") Integer size) {
         Pageable pageable = PageRequest.of(page, size > Constants.MAX_PAGE_SIZE ? Constants.MAX_PAGE_SIZE : size);
         Set<ItemDTO> items = itemService.getAllItems(pageable);
 
-        DefaultResponse<ElementsResponse<ItemDTO>> res = new DefaultResponse<ElementsResponse<ItemDTO>>(
-            new ElementsResponse<ItemDTO>(items, itemService.count())
-        );
+        ElementsResponse<ItemDTO> res = new ElementsResponse<ItemDTO>(items, itemService.count());
         
         return ResponseEntity.ok(res);
     }
