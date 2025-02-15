@@ -8,5 +8,5 @@ public record CategoryDTO(
     String description,
     Long image_id,
     String image,
-    Set<ItemDTO> items
+    Set<Long> items
 ) { }

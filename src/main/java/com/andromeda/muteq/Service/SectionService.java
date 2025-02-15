@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.andromeda.muteq.DTO.SectionDTO;
 import com.andromeda.muteq.Entity.Section;
 import com.andromeda.muteq.Repository.ImageRepository;
+import com.andromeda.muteq.Repository.ItemRepository;
 import com.andromeda.muteq.Repository.SectionRepository;
 
 @Service
@@ -22,10 +23,10 @@ public class SectionService {
     private SectionRepository repository;
 
     @Autowired
-    private ImageRepository imageRepository;
+    private ItemRepository itemRepository;
 
     @Autowired
-    private ItemService itemService;
+    private ImageRepository imageRepository;
 
     public SectionDTO mapToDTO(Section section) {
         return new SectionDTO(
@@ -34,7 +35,7 @@ public class SectionService {
             section.getDescription(),
             section.getImage().getId(),
             section.getImage().getName(),
-            itemService.mapToDTO(section.getItems())
+            section.getItems().stream().map(item -> item.getId()).collect(Collectors.toSet())
         );
     }
 
@@ -58,7 +59,7 @@ public class SectionService {
             section.name(),
             section.description(),
             imageRepository.findByPath(section.image()),
-            itemService.mapToEntity(section.items())
+            itemRepository.findAllById(section.items()).stream().collect(Collectors.toSet())
         );
     }
         
@@ -89,19 +90,19 @@ public class SectionService {
                 .collect(Collectors.toSet());
     }
 
-    public SectionDTO createSection(SectionDTO categoryDTO) {
-        Section item = mapToEntity(categoryDTO);
+    public SectionDTO createSection(SectionDTO sectionDTO) {
+        Section item = mapToEntity(sectionDTO);
         Section savedSection = repository.save(item);
         return mapToDTO(savedSection);
     }
 
-    public SectionDTO updateSection(Long id, SectionDTO categoryDTO) {
-        Section item = repository.findById(id).orElseThrow(() -> new RuntimeException("Section not found"));
-        item.setName(categoryDTO.name());
-        item.setDescription(categoryDTO.description());
-        item.setImage(imageRepository.findById(categoryDTO.image_id()).get());
-        item.setItems(itemService.mapToEntity(categoryDTO.items()));
-        Section updatedSection = repository.save(item);
+    public SectionDTO updateSection(Long id, SectionDTO sectionDTO) {
+        Section section = repository.findById(id).orElseThrow(() -> new RuntimeException("Section not found"));
+        section.setName(sectionDTO.name());
+        section.setDescription(sectionDTO.description());
+        section.setImage(imageRepository.findById(sectionDTO.image_id()).get());
+        section.setItems(itemRepository.findAllById(sectionDTO.items()).stream().collect(Collectors.toSet()));
+        Section updatedSection = repository.save(section);
         return mapToDTO(updatedSection);
     }
 

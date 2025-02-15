@@ -8,5 +8,5 @@ public record SectionDTO(
     String description,
     Long image_id,
     String image,
-    Set<ItemDTO> items
+    Set<Long> items
 ) { }

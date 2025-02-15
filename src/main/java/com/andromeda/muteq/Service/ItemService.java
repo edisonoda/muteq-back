@@ -12,8 +12,10 @@ import org.springframework.stereotype.Service;
 
 import com.andromeda.muteq.DTO.ItemDTO;
 import com.andromeda.muteq.Entity.Item;
+import com.andromeda.muteq.Repository.CategoryRepository;
 import com.andromeda.muteq.Repository.ImageRepository;
 import com.andromeda.muteq.Repository.ItemRepository;
+import com.andromeda.muteq.Repository.SectionRepository;
 
 @Service
 public class ItemService {
@@ -21,10 +23,10 @@ public class ItemService {
     private ItemRepository repository;
 
     @Autowired
-    private CategoryService categoryService;
+    private CategoryRepository categoryRepository;
 
     @Autowired
-    private SectionService sectionService;
+    private SectionRepository sectionRepository;
 
     @Autowired
     private ImageRepository imageRepository;
@@ -38,8 +40,8 @@ public class ItemService {
             item.getYear(),
             item.getImage().getId(),
             item.getImage().getPath(),
-            categoryService.mapToDTO(item.getCategory()),
-            sectionService.mapToDTO(item.getSection())
+            item.getCategory().getId(),
+            item.getSection().getId()
         );
     }
 
@@ -52,8 +54,8 @@ public class ItemService {
             item.getYear(),
             item.getImage().getId(),
             item.getImage().getPath(),
-            categoryService.mapToDTO(item.getCategory()),
-            sectionService.mapToDTO(item.getSection())
+            item.getCategory().getId(),
+            item.getSection().getId()
         )).collect(Collectors.toSet());
     }
 
@@ -65,8 +67,8 @@ public class ItemService {
             item.description(),
             item.year(),
             imageRepository.findByPath(item.image()),
-            categoryService.mapToEntity(item.category()),
-            sectionService.mapToEntity(item.section())
+            categoryRepository.findById(item.id()).get(),
+            sectionRepository.findById(item.id()).get()
         );
     }
 
@@ -78,8 +80,8 @@ public class ItemService {
             item.description(),
             item.year(),
             imageRepository.findByPath(item.image()),
-            categoryService.mapToEntity(item.category()),
-            sectionService.mapToEntity(item.section())
+            categoryRepository.findById(item.id()).get(),
+            sectionRepository.findById(item.id()).get()
         )).collect(Collectors.toSet());
     }
 
@@ -137,8 +139,8 @@ public class ItemService {
         item.setDescription(itemDTO.description());
         item.setYear(itemDTO.year());
         item.setImage(imageRepository.findById(itemDTO.image_id()).get());
-        item.setSection(sectionService.mapToEntity(itemDTO.section()));
-        item.setCategory(categoryService.mapToEntity(itemDTO.category()));
+        item.setCategory(categoryRepository.findById(itemDTO.id()).get());
+        item.setSection(sectionRepository.findById(itemDTO.id()).get());
         Item updatedItem = repository.save(item);
         return mapToDTO(updatedItem);
     }

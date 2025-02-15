@@ -15,6 +15,7 @@ import com.andromeda.muteq.DTO.CategoryDTO;
 import com.andromeda.muteq.Entity.Category;
 import com.andromeda.muteq.Repository.CategoryRepository;
 import com.andromeda.muteq.Repository.ImageRepository;
+import com.andromeda.muteq.Repository.ItemRepository;
 
 @Service
 public class CategoryService {
@@ -22,10 +23,10 @@ public class CategoryService {
     private CategoryRepository repository;
 
     @Autowired
-    private ImageRepository imageRepository;
+    private ItemRepository itemRepository;
 
     @Autowired
-    private ItemService itemService;
+    private ImageRepository imageRepository;
 
     public CategoryDTO mapToDTO(Category category) {
         return new CategoryDTO(
@@ -34,7 +35,7 @@ public class CategoryService {
             category.getDescription(),
             category.getImage().getId(),
             category.getImage().getName(),
-            itemService.mapToDTO(category.getItems())
+            category.getItems().stream().map(item -> item.getId()).collect(Collectors.toSet())
         );
     }
 
@@ -58,7 +59,7 @@ public class CategoryService {
             category.name(),
             category.description(),
             imageRepository.findByPath(category.image()),
-            itemService.mapToEntity(category.items())
+            itemRepository.findAllById(category.items()).stream().collect(Collectors.toSet())
         );
     }
     
@@ -96,12 +97,12 @@ public class CategoryService {
     }
 
     public CategoryDTO updateCategory(Long id, CategoryDTO categoryDTO) {
-        Category item = repository.findById(id).orElseThrow(() -> new RuntimeException("Category not found"));
-        item.setName(categoryDTO.name());
-        item.setDescription(categoryDTO.description());
-        item.setImage(imageRepository.findById(categoryDTO.image_id()).get());
-        item.setItems(itemService.mapToEntity(categoryDTO.items()));
-        Category updatedCategory = repository.save(item);
+        Category category = repository.findById(id).orElseThrow(() -> new RuntimeException("Category not found"));
+        category.setName(categoryDTO.name());
+        category.setDescription(categoryDTO.description());
+        category.setImage(imageRepository.findById(categoryDTO.image_id()).get());
+        category.setItems(itemRepository.findAllById(categoryDTO.items()).stream().collect(Collectors.toSet()));
+        Category updatedCategory = repository.save(category);
         return mapToDTO(updatedCategory);
     }
 

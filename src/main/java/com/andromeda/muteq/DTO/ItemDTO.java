@@ -8,6 +8,6 @@ public record ItemDTO(
     Integer year,
     Long image_id,
     String image,
-    CategoryDTO category,
-    SectionDTO section
+    Long category,
+    Long section
 ) { }
