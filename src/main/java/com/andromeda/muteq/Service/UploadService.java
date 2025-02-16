@@ -34,7 +34,7 @@ public class UploadService {
 
     private Integer getNextNameIncrement(String name) {
         Image img = new Image();
-        img.setName(FilenameUtils.getBaseName(name));
+        img.setName(name);
 
         ExampleMatcher matcher = ExampleMatcher.matching()
                 .withIgnoreCase()
@@ -47,7 +47,7 @@ public class UploadService {
     }
 
     private String sanitizeFilename(String name, String filePath) {
-        return filePath + "\\" + FilenameUtils.getBaseName(name) + "." + FilenameUtils.getExtension(name);
+        return filePath + "." + FilenameUtils.getBaseName(name) + "." + FilenameUtils.getExtension(name);
     }
 
     private String filenameWithoutExtension(String name, String filePath) {
@@ -59,13 +59,13 @@ public class UploadService {
             filePath = "others";
 
         String name = sanitizeFilename(file.getOriginalFilename(), filePath);
-        final boolean available = imageRepository.findByName(name) == null;
+        final boolean available = imageRepository.findByName(name).orElse(null) == null;
 
         if (!available)
             name = filenameWithoutExtension(name, filePath) + " (" + getNextNameIncrement(name) + ")"
                     + "." + FilenameUtils.getExtension(name);
 
-        String path =imageStorageDir + "\\" + name;
+        String path = imageStorageDir + "\\" + name;
 
         imageRepository.save(Image.builder()
             .name(name)
@@ -76,11 +76,11 @@ public class UploadService {
         Files.createDirectories(imageStorageDir);
         Files.createDirectories(Paths.get(imageStorageDir.toString(), filePath));
         file.transferTo(new File(path));
-        return path;
+        return name;
     }
 
     public byte[] downloadImageFromFileSystem(String name) throws IOException {
-        Image imageData = imageRepository.findByName(name);
+        Image imageData = imageRepository.findByName(name).orElse(null);
         String filePath = imageData.getPath();
         byte[] image = Files.readAllBytes(new File(filePath).toPath());
         return image;

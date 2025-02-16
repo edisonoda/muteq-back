@@ -9,7 +9,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.andromeda.muteq.Service.UploadService;
 
+import io.micrometer.common.lang.Nullable;
+
 import java.io.IOException;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/image")
@@ -18,14 +21,16 @@ public class ImageController {
     private UploadService uploadService;
 
     @PostMapping
-    public ResponseEntity<?> uploadImage(@RequestParam MultipartFile image) throws IOException {
-        String uploadImage = uploadService.uploadImageToFileSystem(image);
-        return ResponseEntity.ok(uploadImage);
+    public ResponseEntity<?> uploadImage(@RequestParam MultipartFile image, @Nullable @RequestParam String path) throws IOException {
+        HashMap<String, String> res = new HashMap<>();
+        String uploadImage = uploadService.uploadImageToFileSystem(image, path);
+        res.put("image", uploadImage);
+        return ResponseEntity.ok(res);
     }
 
     @GetMapping
-    public ResponseEntity<byte[]> downloadImage(@RequestParam String fileName) throws IOException {
-        byte[] image = uploadService.downloadImageFromFileSystem(fileName);
+    public ResponseEntity<byte[]> downloadImage(@RequestParam String name) throws IOException {
+        byte[] image = uploadService.downloadImageFromFileSystem(name);
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.valueOf("image/png")).body(image);
     }
 }
