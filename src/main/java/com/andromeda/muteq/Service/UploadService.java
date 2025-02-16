@@ -73,8 +73,8 @@ public class UploadService {
             .path(path)
             .build());
         
-        Files.createDirectory(imageStorageDir);
-        Files.createDirectory(Paths.get(imageStorageDir.toString(), filePath));
+        Files.createDirectories(imageStorageDir);
+        Files.createDirectories(Paths.get(imageStorageDir.toString(), filePath));
         file.transferTo(new File(path));
         return path;
     }
