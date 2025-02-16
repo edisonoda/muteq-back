@@ -33,8 +33,7 @@ public class SectionService {
             section.getId(),
             section.getName(),
             section.getDescription(),
-            section.getImage().getId(),
-            section.getImage().getName(),
+            section.getImage() != null ? section.getImage().getName() : null,
             section.getItems().stream().map(item -> item.getId()).collect(Collectors.toSet())
         );
     }
@@ -47,8 +46,7 @@ public class SectionService {
             section.getId(),
             section.getName(),
             section.getDescription(),
-            section.getImage().getId(),
-            section.getImage().getName(),
+            section.getImage() != null ? section.getImage().getName() : null,
             new HashSet<>()
         );
     }
@@ -58,7 +56,7 @@ public class SectionService {
             section.id(),
             section.name(),
             section.description(),
-            imageRepository.findByPath(section.image()),
+            imageRepository.findByName(section.image()).orElse(null),
             itemRepository.findAllById(section.items()).stream().collect(Collectors.toSet())
         );
     }
@@ -72,27 +70,27 @@ public class SectionService {
     }
 
     public SectionDTO getSectionById(Long id) {
-        Section item = repository.findById(id).orElseThrow(() -> new RuntimeException("Section not found"));
-        return mapToDTO(item);
+        Section section = repository.findById(id).orElseThrow(() -> new RuntimeException("Section not found"));
+        return mapToDTO(section);
     }
 
     public Set<SectionDTO> getSectionsByName(String name, Pageable page) {
-        Section item = new Section();
-        item.setName(name);
+        Section section = new Section();
+        section.setName(name);
 
         ExampleMatcher matcher = ExampleMatcher.matching()
             .withIgnoreCase()
             .withIgnorePaths("content")
             .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
         
-        return repository.findAll(Example.of(item, matcher), page).stream()
+        return repository.findAll(Example.of(section, matcher), page).stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toSet());
     }
 
     public SectionDTO createSection(SectionDTO sectionDTO) {
-        Section item = mapToEntity(sectionDTO);
-        Section savedSection = repository.save(item);
+        Section section = mapToEntity(sectionDTO);
+        Section savedSection = repository.save(section);
         return mapToDTO(savedSection);
     }
 
@@ -100,14 +98,18 @@ public class SectionService {
         Section section = repository.findById(id).orElseThrow(() -> new RuntimeException("Section not found"));
         section.setName(sectionDTO.name());
         section.setDescription(sectionDTO.description());
-        section.setImage(imageRepository.findById(sectionDTO.image_id()).get());
+        section.setImage(imageRepository.findByName(sectionDTO.name()).orElse(null));
         section.setItems(itemRepository.findAllById(sectionDTO.items()).stream().collect(Collectors.toSet()));
         Section updatedSection = repository.save(section);
         return mapToDTO(updatedSection);
     }
 
     public void deleteSection(Long id) {
-        Section item = repository.findById(id).orElseThrow(() -> new RuntimeException("Section not found"));
-        repository.delete(item);
+        Section section = repository.findById(id).orElseThrow(() -> new RuntimeException("Section not found"));
+        repository.delete(section);
+    }
+
+    public Long count() {
+        return repository.count();
     }
 }

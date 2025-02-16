@@ -6,7 +6,6 @@ public record ItemDTO(
     String manufacturer,
     String description,
     Integer year,
-    Long image_id,
     String image,
     Long category,
     Long section

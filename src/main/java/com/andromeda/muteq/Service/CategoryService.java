@@ -33,8 +33,7 @@ public class CategoryService {
             category.getId(),
             category.getName(),
             category.getDescription(),
-            category.getImage().getId(),
-            category.getImage().getName(),
+            category.getImage() != null ? category.getImage().getName() : null,
             category.getItems().stream().map(item -> item.getId()).collect(Collectors.toSet())
         );
     }
@@ -47,8 +46,7 @@ public class CategoryService {
             category.getId(),
             category.getName(),
             category.getDescription(),
-            category.getImage().getId(),
-            category.getImage().getName(),
+            category.getImage() != null ? category.getImage().getName() : null,
             new HashSet<>()
         );
     }
@@ -58,7 +56,7 @@ public class CategoryService {
             category.id(),
             category.name(),
             category.description(),
-            imageRepository.findByPath(category.image()),
+            imageRepository.findByName(category.image()).orElse(null),
             itemRepository.findAllById(category.items()).stream().collect(Collectors.toSet())
         );
     }
@@ -72,27 +70,27 @@ public class CategoryService {
     }
 
     public CategoryDTO getCategoryById(Long id) {
-        Category item = repository.findById(id).orElseThrow(() -> new RuntimeException("Category not found"));
-        return mapToDTO(item);
+        Category category = repository.findById(id).orElseThrow(() -> new RuntimeException("Category not found"));
+        return mapToDTO(category);
     }
 
     public Set<CategoryDTO> getCategoriesByName(String name, Pageable page) {
-        Category item = new Category();
-        item.setName(name);
+        Category category = new Category();
+        category.setName(name);
 
         ExampleMatcher matcher = ExampleMatcher.matching()
             .withIgnoreCase()
             .withIgnorePaths("content")
             .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
         
-        return repository.findAll(Example.of(item, matcher), page).stream()
+        return repository.findAll(Example.of(category, matcher), page).stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toSet());
     }
 
     public CategoryDTO createCategory(CategoryDTO categoryDTO) {
-        Category item = mapToEntity(categoryDTO);
-        Category savedCategory = repository.save(item);
+        Category category = mapToEntity(categoryDTO);
+        Category savedCategory = repository.save(category);
         return mapToDTO(savedCategory);
     }
 
@@ -100,14 +98,18 @@ public class CategoryService {
         Category category = repository.findById(id).orElseThrow(() -> new RuntimeException("Category not found"));
         category.setName(categoryDTO.name());
         category.setDescription(categoryDTO.description());
-        category.setImage(imageRepository.findById(categoryDTO.image_id()).get());
+        category.setImage(imageRepository.findByName(categoryDTO.name()).orElse(null));
         category.setItems(itemRepository.findAllById(categoryDTO.items()).stream().collect(Collectors.toSet()));
         Category updatedCategory = repository.save(category);
         return mapToDTO(updatedCategory);
     }
 
     public void deleteCategory(Long id) {
-        Category item = repository.findById(id).orElseThrow(() -> new RuntimeException("Category not found"));
-        repository.delete(item);
+        Category category = repository.findById(id).orElseThrow(() -> new RuntimeException("Category not found"));
+        repository.delete(category);
+    }
+
+    public Long count() {
+        return repository.count();
     }
 }

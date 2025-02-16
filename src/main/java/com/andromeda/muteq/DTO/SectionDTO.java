@@ -6,7 +6,6 @@ public record SectionDTO(
     Long id,
     String name,
     String description,
-    Long image_id,
     String image,
     Set<Long> items
 ) { }
