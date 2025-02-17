@@ -39,7 +39,7 @@ public class Item {
     @Column
     private Integer year;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="image_id", unique=true, nullable=true, updatable=true)
     private Image image;
 

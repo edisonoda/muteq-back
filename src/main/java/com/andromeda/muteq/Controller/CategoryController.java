@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.andromeda.muteq.DTO.CategoryDTO;
 import com.andromeda.muteq.Service.CategoryService;
 import com.andromeda.muteq.Util.Constants;
+import com.andromeda.muteq.Util.DefaultResponse;
 import com.andromeda.muteq.Util.ElementsResponse;
 
 @RestController
@@ -69,8 +70,8 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
+    public ResponseEntity<DefaultResponse<Boolean>> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(new DefaultResponse<Boolean>(true));
     }
 }

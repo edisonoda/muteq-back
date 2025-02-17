@@ -34,7 +34,7 @@ public class Section {
     @Column
     private String description;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="image_id", unique=true, nullable=true, updatable=true)
     private Image image;
 
