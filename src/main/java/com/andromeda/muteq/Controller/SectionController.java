@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.andromeda.muteq.DTO.SectionDTO;
 import com.andromeda.muteq.Service.SectionService;
 import com.andromeda.muteq.Util.Constants;
+import com.andromeda.muteq.Util.DefaultResponse;
 import com.andromeda.muteq.Util.ElementsResponse;
 
 @RestController
@@ -69,8 +70,8 @@ public class SectionController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSection(@PathVariable Long id) {
+    public ResponseEntity<DefaultResponse<Boolean>> deleteSection(@PathVariable Long id) {
         sectionService.deleteSection(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(new DefaultResponse<Boolean>(true));
     }
 }

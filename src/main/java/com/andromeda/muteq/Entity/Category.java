@@ -34,7 +34,7 @@ public class Category {
     @Column
     private String description;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(optional = true, cascade = CascadeType.ALL)
     @JoinColumn(name="image_id", unique=true, nullable=true, updatable=true)
     private Image image;
 
