@@ -41,14 +41,16 @@ public class SectionController {
     }
 
     @GetMapping("/search/{name}")
-    public ResponseEntity<Set<SectionDTO>> getSectionsByName(
+    public ResponseEntity<ElementsResponse<SectionDTO>> getSectionsByName(
             @PathVariable String name,
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "10") Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Set<SectionDTO> sections = sectionService.getSectionsByName(name, pageable);
 
-        return ResponseEntity.ok(sections);
+        ElementsResponse<SectionDTO> res = new ElementsResponse<SectionDTO>(sections, sectionService.count());
+
+        return ResponseEntity.ok(res);
     }
 
     @GetMapping("/{id}")

@@ -41,14 +41,16 @@ public class CategoryController {
     }
 
     @GetMapping("/search/{name}")
-    public ResponseEntity<Set<CategoryDTO>> getCategoriesByName(
+    public ResponseEntity<ElementsResponse<CategoryDTO>> getCategoriesByName(
             @PathVariable String name,
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "10") Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Set<CategoryDTO> categories = categoryService.getCategoriesByName(name, pageable);
 
-        return ResponseEntity.ok(categories);
+        ElementsResponse<CategoryDTO> res = new ElementsResponse<CategoryDTO>(categories, categoryService.count());
+
+        return ResponseEntity.ok(res);
     }
 
     @GetMapping("/{id}")
