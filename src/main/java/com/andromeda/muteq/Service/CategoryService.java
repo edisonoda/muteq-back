@@ -1,7 +1,6 @@
 package com.andromeda.muteq.Service;
 
 import java.util.HashSet;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +15,7 @@ import com.andromeda.muteq.Entity.Category;
 import com.andromeda.muteq.Repository.CategoryRepository;
 import com.andromeda.muteq.Repository.ImageRepository;
 import com.andromeda.muteq.Repository.ItemRepository;
+import com.andromeda.muteq.Util.ElementsResponse;
 
 @Service
 public class CategoryService {
@@ -61,12 +61,13 @@ public class CategoryService {
         );
     }
     
-    public Set<CategoryDTO> getAllCategories(Pageable page) {
+    public ElementsResponse<CategoryDTO> getAllCategories(Pageable page) {
         Page<Category> pageCategory = repository.findAll(page);
 
-        return pageCategory.stream()
+        return new ElementsResponse<>(pageCategory.stream()
                 .map(this::mapToDTO)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toSet()),
+                pageCategory.getTotalElements());
     }
 
     public CategoryDTO getCategoryById(Long id) {
@@ -74,7 +75,7 @@ public class CategoryService {
         return mapToDTO(category);
     }
 
-    public Set<CategoryDTO> getCategoriesByName(String name, Pageable page) {
+    public ElementsResponse<CategoryDTO> getCategoriesByName(String name, Pageable page) {
         Category category = new Category();
         category.setName(name);
 
@@ -83,9 +84,12 @@ public class CategoryService {
             .withIgnorePaths("content")
             .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
         
-        return repository.findAll(Example.of(category, matcher), page).stream()
+        Page<Category> pageCategory = repository.findAll(Example.of(category, matcher), page);
+
+        return new ElementsResponse<>(pageCategory.stream()
                 .map(this::mapToDTO)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toSet()),
+                pageCategory.getTotalElements());
     }
 
     public CategoryDTO createCategory(CategoryDTO categoryDTO) {
@@ -107,9 +111,5 @@ public class CategoryService {
     public void deleteCategory(Long id) {
         Category category = repository.findById(id).orElseThrow(() -> new RuntimeException("Category not found"));
         repository.delete(category);
-    }
-
-    public Long count() {
-        return repository.count();
     }
 }

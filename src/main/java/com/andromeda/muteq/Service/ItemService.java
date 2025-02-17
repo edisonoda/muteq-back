@@ -19,6 +19,7 @@ import com.andromeda.muteq.Repository.CategoryRepository;
 import com.andromeda.muteq.Repository.ImageRepository;
 import com.andromeda.muteq.Repository.ItemRepository;
 import com.andromeda.muteq.Repository.SectionRepository;
+import com.andromeda.muteq.Util.ElementsResponse;
 import com.andromeda.muteq.Util.GroupedItemsResponse;
 
 @Service
@@ -106,12 +107,13 @@ public class ItemService {
         )).collect(Collectors.toSet());
     }
 
-    public Set<ItemResponseDTO> getAllItems(Pageable page) {
+    public ElementsResponse<ItemResponseDTO> getAllItems(Pageable page) {
         Page<Item> pageItem = repository.findAll(page);
 
-        return pageItem.stream()
+        return new ElementsResponse<>(pageItem.stream()
                 .map(this::mapToResponseDTO)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toSet()),
+                pageItem.getTotalElements());
     }
 
     public ItemResponseDTO getItemById(Long id) {
@@ -119,7 +121,7 @@ public class ItemService {
         return mapToResponseDTO(item);
     }
 
-    public Set<ItemResponseDTO> getItemsByName(String name, Pageable page) {
+    public ElementsResponse<ItemResponseDTO> getItemsByName(String name, Pageable page) {
         Item item = new Item();
         item.setName(name);
 
@@ -128,9 +130,12 @@ public class ItemService {
             .withIgnorePaths("content")
             .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
         
-        return repository.findAll(Example.of(item, matcher), page).stream()
+        Page<Item> pageItem = repository.findAll(Example.of(item, matcher), page);
+        
+        return new ElementsResponse<>(pageItem.stream()
                 .map(this::mapToResponseDTO)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toSet()),
+                pageItem.getTotalElements());
     }
 
     public GroupedItemsResponse getItemsByCategory(Long id, Pageable page) {
@@ -139,7 +144,7 @@ public class ItemService {
 
         return new GroupedItemsResponse(
             pageItem.stream().map(this::mapToResponseDTO).collect(Collectors.toSet()),
-            count(),
+            pageItem.getTotalElements(),
             category != null ? category.getName() : "Categoria"
         );
     }
@@ -150,7 +155,7 @@ public class ItemService {
 
         return new GroupedItemsResponse(
             pageItem.stream().map(this::mapToResponseDTO).collect(Collectors.toSet()),
-            count(),
+            pageItem.getTotalElements(),
             section != null ? section.getName() : "Seção"
         );
     }
@@ -177,9 +182,5 @@ public class ItemService {
     public void deleteItem(Long id) {
         Item item = repository.findById(id).orElseThrow(() -> new RuntimeException("Item not found"));
         repository.delete(item);
-    }
-
-    public Long count() {
-        return repository.count();
     }
 }

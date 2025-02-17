@@ -1,7 +1,6 @@
 package com.andromeda.muteq.Service;
 
 import java.util.HashSet;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +15,7 @@ import com.andromeda.muteq.Entity.Section;
 import com.andromeda.muteq.Repository.ImageRepository;
 import com.andromeda.muteq.Repository.ItemRepository;
 import com.andromeda.muteq.Repository.SectionRepository;
+import com.andromeda.muteq.Util.ElementsResponse;
 
 @Service
 public class SectionService {
@@ -61,12 +61,13 @@ public class SectionService {
         );
     }
         
-    public Set<SectionDTO> getAllSections(Pageable page) {
+    public ElementsResponse<SectionDTO> getAllSections(Pageable page) {
         Page<Section> pageSection = repository.findAll(page);
 
-        return pageSection.stream()
+        return new ElementsResponse<>(pageSection.stream()
                 .map(this::mapToDTO)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toSet()),
+                pageSection.getTotalElements());
     }
 
     public SectionDTO getSectionById(Long id) {
@@ -74,7 +75,7 @@ public class SectionService {
         return mapToDTO(section);
     }
 
-    public Set<SectionDTO> getSectionsByName(String name, Pageable page) {
+    public ElementsResponse<SectionDTO> getSectionsByName(String name, Pageable page) {
         Section section = new Section();
         section.setName(name);
 
@@ -82,10 +83,13 @@ public class SectionService {
             .withIgnoreCase()
             .withIgnorePaths("content")
             .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
+
+        Page<Section> pageSection = repository.findAll(Example.of(section, matcher), page);
         
-        return repository.findAll(Example.of(section, matcher), page).stream()
+        return new ElementsResponse<>(pageSection.stream()
                 .map(this::mapToDTO)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toSet()),
+                pageSection.getTotalElements());
     }
 
     public SectionDTO createSection(SectionDTO sectionDTO) {
@@ -107,9 +111,5 @@ public class SectionService {
     public void deleteSection(Long id) {
         Section section = repository.findById(id).orElseThrow(() -> new RuntimeException("Section not found"));
         repository.delete(section);
-    }
-
-    public Long count() {
-        return repository.count();
     }
 }

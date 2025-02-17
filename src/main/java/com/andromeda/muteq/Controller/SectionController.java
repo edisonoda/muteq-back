@@ -1,7 +1,5 @@
 package com.andromeda.muteq.Controller;
 
-import java.util.Set;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -33,10 +31,7 @@ public class SectionController {
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "10") Integer size) {
         Pageable pageable = PageRequest.of(page, size > Constants.MAX_PAGE_SIZE ? Constants.MAX_PAGE_SIZE : size);
-        Set<SectionDTO> sections = sectionService.getAllSections(pageable);
-
-        ElementsResponse<SectionDTO> res = new ElementsResponse<SectionDTO>(sections, sectionService.count());
-        
+        ElementsResponse<SectionDTO> res = sectionService.getAllSections(pageable);
         return ResponseEntity.ok(res);
     }
 
@@ -46,10 +41,7 @@ public class SectionController {
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "10") Integer size) {
         Pageable pageable = PageRequest.of(page, size);
-        Set<SectionDTO> sections = sectionService.getSectionsByName(name, pageable);
-
-        ElementsResponse<SectionDTO> res = new ElementsResponse<SectionDTO>(sections, sectionService.count());
-
+        ElementsResponse<SectionDTO> res = sectionService.getSectionsByName(name, pageable);
         return ResponseEntity.ok(res);
     }
 

@@ -10,8 +10,6 @@ import com.andromeda.muteq.Util.DefaultResponse;
 import com.andromeda.muteq.Util.ElementsResponse;
 import com.andromeda.muteq.Util.GroupedItemsResponse;
 
-import java.util.Set;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -36,10 +34,7 @@ public class ItemController {
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "10") Integer size) {
         Pageable pageable = PageRequest.of(page, size > Constants.MAX_PAGE_SIZE ? Constants.MAX_PAGE_SIZE : size);
-        Set<ItemResponseDTO> items = itemService.getAllItems(pageable);
-
-        ElementsResponse<ItemResponseDTO> res = new ElementsResponse<ItemResponseDTO>(items, itemService.count());
-        
+        ElementsResponse<ItemResponseDTO> res = itemService.getAllItems(pageable);
         return ResponseEntity.ok(res);
     }
 
@@ -49,10 +44,7 @@ public class ItemController {
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "10") Integer size) {
         Pageable pageable = PageRequest.of(page, size);
-        Set<ItemResponseDTO> items = itemService.getItemsByName(name, pageable);
-
-        ElementsResponse<ItemResponseDTO> res = new ElementsResponse<ItemResponseDTO>(items, itemService.count());
-
+        ElementsResponse<ItemResponseDTO> res = itemService.getItemsByName(name, pageable);
         return ResponseEntity.ok(res);
     }
 
