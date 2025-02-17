@@ -24,6 +24,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Item {
     @Id
+    @Column(nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

@@ -38,7 +38,7 @@ public class ItemService {
             item.getManufacturer(),
             item.getDescription(),
             item.getYear(),
-            item.getImage() != null ? item.getImage().getPath() : null,
+            item.getImage() != null ? item.getImage().getName() : null,
             item.getCategory().getId(),
             item.getSection().getId()
         );
@@ -51,7 +51,7 @@ public class ItemService {
             item.getManufacturer(),
             item.getDescription(),
             item.getYear(),
-            item.getImage() != null ? item.getImage().getPath() : null,
+            item.getImage() != null ? item.getImage().getName() : null,
             item.getCategory().getId(),
             item.getSection().getId()
         )).collect(Collectors.toSet());
@@ -65,8 +65,8 @@ public class ItemService {
             item.description(),
             item.year(),
             imageRepository.findByName(item.image()).orElse(null),
-            categoryRepository.findById(item.id()).orElse(null),
-            sectionRepository.findById(item.id()).orElse(null)
+            categoryRepository.findById(item.category()).orElse(null),
+            sectionRepository.findById(item.section()).orElse(null)
         );
     }
 
@@ -137,8 +137,8 @@ public class ItemService {
         item.setDescription(itemDTO.description());
         item.setYear(itemDTO.year());
         item.setImage(imageRepository.findByName(itemDTO.image()).orElse(null));
-        item.setCategory(categoryRepository.findById(itemDTO.id()).orElse(null));
-        item.setSection(sectionRepository.findById(itemDTO.id()).orElse(null));
+        item.setCategory(categoryRepository.findById(itemDTO.category()).orElse(null));
+        item.setSection(sectionRepository.findById(itemDTO.section()).orElse(null));
         Item updatedItem = repository.save(item);
         return mapToDTO(updatedItem);
     }

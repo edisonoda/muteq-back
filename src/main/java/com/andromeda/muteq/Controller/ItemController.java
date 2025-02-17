@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.andromeda.muteq.DTO.ItemDTO;
 import com.andromeda.muteq.Service.ItemService;
 import com.andromeda.muteq.Util.Constants;
+import com.andromeda.muteq.Util.DefaultResponse;
 import com.andromeda.muteq.Util.ElementsResponse;
 
 import java.util.Set;
@@ -70,8 +71,8 @@ public class ItemController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteItem(@PathVariable Long id) {
+    public ResponseEntity<DefaultResponse<Boolean>> deleteItem(@PathVariable Long id) {
         itemService.deleteItem(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(new DefaultResponse<Boolean>(true));
     }
 }
