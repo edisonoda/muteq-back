@@ -98,7 +98,7 @@ public class SectionService {
         Section section = repository.findById(id).orElseThrow(() -> new RuntimeException("Section not found"));
         section.setName(sectionDTO.name());
         section.setDescription(sectionDTO.description());
-        section.setImage(imageRepository.findByName(sectionDTO.name()).orElse(null));
+        section.setImage(imageRepository.findByName(sectionDTO.image()).orElse(null));
         section.setItems(itemRepository.findAllById(sectionDTO.items()).stream().collect(Collectors.toSet()));
         Section updatedSection = repository.save(section);
         return mapToDTO(updatedSection);

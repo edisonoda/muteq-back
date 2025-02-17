@@ -136,7 +136,7 @@ public class ItemService {
         item.setManufacturer(itemDTO.manufacturer());
         item.setDescription(itemDTO.description());
         item.setYear(itemDTO.year());
-        item.setImage(imageRepository.findByName(itemDTO.name()).orElse(null));
+        item.setImage(imageRepository.findByName(itemDTO.image()).orElse(null));
         item.setCategory(categoryRepository.findById(itemDTO.id()).orElse(null));
         item.setSection(sectionRepository.findById(itemDTO.id()).orElse(null));
         Item updatedItem = repository.save(item);

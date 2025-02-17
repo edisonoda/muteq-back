@@ -98,7 +98,7 @@ public class CategoryService {
         Category category = repository.findById(id).orElseThrow(() -> new RuntimeException("Category not found"));
         category.setName(categoryDTO.name());
         category.setDescription(categoryDTO.description());
-        category.setImage(imageRepository.findByName(categoryDTO.name()).orElse(null));
+        category.setImage(imageRepository.findByName(categoryDTO.image()).orElse(null));
         category.setItems(itemRepository.findAllById(categoryDTO.items()).stream().collect(Collectors.toSet()));
         Category updatedCategory = repository.save(category);
         return mapToDTO(updatedCategory);

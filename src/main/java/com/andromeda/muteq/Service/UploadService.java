@@ -46,33 +46,45 @@ public class UploadService {
         return images.size();
     }
 
-    private String sanitizeFilename(String name, String filePath) {
-        return filePath + "." + FilenameUtils.getBaseName(name) + "." + FilenameUtils.getExtension(name);
+    private String sanitizeFilename(String name, String filePath, String connector) {
+        return filePath + connector + FilenameUtils.getBaseName(name) + "." + FilenameUtils.getExtension(name);
     }
 
-    private String filenameWithoutExtension(String name, String filePath) {
-        return filePath + "\\" + FilenameUtils.getBaseName(name);
+    private String filenameWithoutExtension(String name, String filePath, String connector) {
+        return filePath + connector + FilenameUtils.getBaseName(name);
     }
 
     public String uploadImageToFileSystem(MultipartFile file, @Nullable String filePath) throws IOException {
         if (filePath == null)
             filePath = "others";
 
-        String name = sanitizeFilename(file.getOriginalFilename(), filePath);
+        final String originalName = file.getOriginalFilename();
+
+        String name = sanitizeFilename(originalName, filePath, ".");
+        String pathname = sanitizeFilename(originalName, filePath, "\\");
+
         final boolean available = imageRepository.findByName(name).orElse(null) == null;
 
-        if (!available)
-            name = filenameWithoutExtension(name, filePath) + " (" + getNextNameIncrement(name) + ")"
-                    + "." + FilenameUtils.getExtension(name);
+        if (!available) {
+            name = filenameWithoutExtension(originalName, filePath, ".");
 
-        String path = imageStorageDir + "\\" + name;
+            final int increment = getNextNameIncrement(name);
+            final String incrementAndExtension = " (" + increment + ")" + "."
+                    + FilenameUtils.getExtension(originalName);
+
+            name += incrementAndExtension;
+            pathname = filenameWithoutExtension(originalName, filePath, "\\")
+                    + incrementAndExtension;
+        }
+
+        String path = imageStorageDir + "\\" + pathname;
 
         imageRepository.save(Image.builder()
-            .name(name)
-            .type(file.getContentType())
-            .path(path)
-            .build());
-        
+                .name(name)
+                .type(file.getContentType())
+                .path(path)
+                .build());
+
         Files.createDirectories(imageStorageDir);
         Files.createDirectories(Paths.get(imageStorageDir.toString(), filePath));
         file.transferTo(new File(path));
