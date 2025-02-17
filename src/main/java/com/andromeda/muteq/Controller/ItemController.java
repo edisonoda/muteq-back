@@ -7,6 +7,7 @@ import com.andromeda.muteq.Service.ItemService;
 import com.andromeda.muteq.Util.Constants;
 import com.andromeda.muteq.Util.DefaultResponse;
 import com.andromeda.muteq.Util.ElementsResponse;
+import com.andromeda.muteq.Util.GroupedItemsResponse;
 
 import java.util.Set;
 
@@ -38,6 +39,26 @@ public class ItemController {
 
         ElementsResponse<ItemDTO> res = new ElementsResponse<ItemDTO>(items, itemService.count());
         
+        return ResponseEntity.ok(res);
+    }
+
+    @GetMapping("/category")
+    public ResponseEntity<GroupedItemsResponse> getItemsByCategory(
+            @RequestParam() Long category,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
+        Pageable pageable = PageRequest.of(page, size > Constants.MAX_PAGE_SIZE ? Constants.MAX_PAGE_SIZE : size);
+        GroupedItemsResponse res = itemService.getItemsByCategory(category, pageable);
+        return ResponseEntity.ok(res);
+    }
+
+    @GetMapping("/section")
+    public ResponseEntity<GroupedItemsResponse> getItemsBySection(
+            @RequestParam() Long section,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
+        Pageable pageable = PageRequest.of(page, size > Constants.MAX_PAGE_SIZE ? Constants.MAX_PAGE_SIZE : size);
+        GroupedItemsResponse res = itemService.getItemsBySection(section, pageable);
         return ResponseEntity.ok(res);
     }
 

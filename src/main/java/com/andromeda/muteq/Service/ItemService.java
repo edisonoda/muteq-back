@@ -11,11 +11,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import com.andromeda.muteq.DTO.ItemDTO;
+import com.andromeda.muteq.Entity.Category;
 import com.andromeda.muteq.Entity.Item;
+import com.andromeda.muteq.Entity.Section;
 import com.andromeda.muteq.Repository.CategoryRepository;
 import com.andromeda.muteq.Repository.ImageRepository;
 import com.andromeda.muteq.Repository.ItemRepository;
 import com.andromeda.muteq.Repository.SectionRepository;
+import com.andromeda.muteq.Util.GroupedItemsResponse;
 
 @Service
 public class ItemService {
@@ -110,19 +113,27 @@ public class ItemService {
                 .collect(Collectors.toSet());
     }
 
-    // public Set<ItemDTO> getItemsByCategory(Long id, Pageable page) {
-    //     Item item = new Item();
-    //     item.setCategory(id);
+    public GroupedItemsResponse getItemsByCategory(Long id, Pageable page) {
+        Page<Item> pageItem = repository.findAllByCategoryId(id, page);
+        Category category = categoryRepository.findById(id).orElse(null);
 
-    //     ExampleMatcher matcher = ExampleMatcher.matching()
-    //         .withIgnoreCase()
-    //         .withIgnorePaths("content")
-    //         .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
-        
-    //     return repository.findAll(Example.of(item, matcher), page).stream()
-    //             .map(this::mapToDTO)
-    //             .collect(Collectors.toSet());
-    // }
+        return new GroupedItemsResponse(
+            pageItem.stream().map(this::mapToDTO).collect(Collectors.toSet()),
+            count(),
+            category != null ? category.getName() : "Categoria"
+        );
+    }
+
+    public GroupedItemsResponse getItemsBySection(Long id, Pageable page) {
+        Page<Item> pageItem = repository.findAllBySectionId(id, page);
+        Section section = sectionRepository.findById(id).orElse(null);
+
+        return new GroupedItemsResponse(
+            pageItem.stream().map(this::mapToDTO).collect(Collectors.toSet()),
+            count(),
+            section != null ? section.getName() : "Seção"
+        );
+    }
 
     public ItemDTO createItem(ItemDTO itemDTO) {
         Item item = mapToEntity(itemDTO);
