@@ -2,6 +2,6 @@ package com.andromeda.muteq.Util;
 
 import java.util.Set;
 
-import com.andromeda.muteq.DTO.ItemDTO;
+import com.andromeda.muteq.DTO.ItemResponseDTO;
 
-public record GroupedItemsResponse(Set<ItemDTO> elements, Long count, String name) { }
+public record GroupedItemsResponse(Set<ItemResponseDTO> elements, Long count, String name) { }

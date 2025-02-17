@@ -3,6 +3,7 @@ package com.andromeda.muteq.Controller;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.andromeda.muteq.DTO.ItemDTO;
+import com.andromeda.muteq.DTO.ItemResponseDTO;
 import com.andromeda.muteq.Service.ItemService;
 import com.andromeda.muteq.Util.Constants;
 import com.andromeda.muteq.Util.DefaultResponse;
@@ -31,26 +32,26 @@ public class ItemController {
     private ItemService itemService;
 
     @GetMapping
-    public ResponseEntity<ElementsResponse<ItemDTO>> getAllItems(
+    public ResponseEntity<ElementsResponse<ItemResponseDTO>> getAllItems(
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "10") Integer size) {
         Pageable pageable = PageRequest.of(page, size > Constants.MAX_PAGE_SIZE ? Constants.MAX_PAGE_SIZE : size);
-        Set<ItemDTO> items = itemService.getAllItems(pageable);
+        Set<ItemResponseDTO> items = itemService.getAllItems(pageable);
 
-        ElementsResponse<ItemDTO> res = new ElementsResponse<ItemDTO>(items, itemService.count());
+        ElementsResponse<ItemResponseDTO> res = new ElementsResponse<ItemResponseDTO>(items, itemService.count());
         
         return ResponseEntity.ok(res);
     }
 
     @GetMapping("/search/{name}")
-    public ResponseEntity<ElementsResponse<ItemDTO>> getItemsByName(
+    public ResponseEntity<ElementsResponse<ItemResponseDTO>> getItemsByName(
             @PathVariable String name,
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "10") Integer size) {
         Pageable pageable = PageRequest.of(page, size);
-        Set<ItemDTO> items = itemService.getItemsByName(name, pageable);
+        Set<ItemResponseDTO> items = itemService.getItemsByName(name, pageable);
 
-        ElementsResponse<ItemDTO> res = new ElementsResponse<ItemDTO>(items, itemService.count());
+        ElementsResponse<ItemResponseDTO> res = new ElementsResponse<ItemResponseDTO>(items, itemService.count());
 
         return ResponseEntity.ok(res);
     }
@@ -76,20 +77,20 @@ public class ItemController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ItemDTO> getItemById(@PathVariable Long id) {
-        ItemDTO item = itemService.getItemById(id);
+    public ResponseEntity<ItemResponseDTO> getItemById(@PathVariable Long id) {
+        ItemResponseDTO item = itemService.getItemById(id);
         return ResponseEntity.ok(item);
     }
 
     @PostMapping
-    public ResponseEntity<ItemDTO> createItem(@RequestBody ItemDTO itemDTO) {
-        ItemDTO createdItem = itemService.createItem(itemDTO);
+    public ResponseEntity<ItemResponseDTO> createItem(@RequestBody ItemDTO itemDTO) {
+        ItemResponseDTO createdItem = itemService.createItem(itemDTO);
         return ResponseEntity.ok(createdItem);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ItemDTO> updateItem(@PathVariable Long id, @RequestBody ItemDTO itemDTO) {
-        ItemDTO updatedItem = itemService.updateItem(id, itemDTO);
+    public ResponseEntity<ItemResponseDTO> updateItem(@PathVariable Long id, @RequestBody ItemDTO itemDTO) {
+        ItemResponseDTO updatedItem = itemService.updateItem(id, itemDTO);
         return ResponseEntity.ok(updatedItem);
     }
 

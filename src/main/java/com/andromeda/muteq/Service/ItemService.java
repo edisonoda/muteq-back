@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import com.andromeda.muteq.DTO.ItemDTO;
+import com.andromeda.muteq.DTO.ItemResponseDTO;
 import com.andromeda.muteq.Entity.Category;
 import com.andromeda.muteq.Entity.Item;
 import com.andromeda.muteq.Entity.Section;
@@ -34,6 +35,25 @@ public class ItemService {
     @Autowired
     private ImageRepository imageRepository;
 
+    @Autowired
+    private CategoryService categoryService;
+
+    @Autowired
+    private SectionService sectionService;
+
+    public ItemResponseDTO mapToResponseDTO(Item item) {
+        return new ItemResponseDTO(
+            item.getId(),
+            item.getName(),
+            item.getManufacturer(),
+            item.getDescription(),
+            item.getYear(),
+            item.getImage() != null ? item.getImage().getName() : null,
+            item.getCategory() != null ? categoryService.mapToDTO(item.getCategory()) : null,
+            item.getSection() != null ? sectionService.mapToDTO(item.getSection()) : null
+        );
+    }
+
     public ItemDTO mapToDTO(Item item) {
         return new ItemDTO(
             item.getId(),
@@ -42,8 +62,8 @@ public class ItemService {
             item.getDescription(),
             item.getYear(),
             item.getImage() != null ? item.getImage().getName() : null,
-            item.getCategory().getId(),
-            item.getSection().getId()
+            item.getCategory() != null ? item.getCategory().getId() : null,
+            item.getSection() != null ? item.getSection().getId() : null
         );
     }
 
@@ -55,8 +75,8 @@ public class ItemService {
             item.getDescription(),
             item.getYear(),
             item.getImage() != null ? item.getImage().getName() : null,
-            item.getCategory().getId(),
-            item.getSection().getId()
+            item.getCategory() != null ? item.getCategory().getId() : null,
+            item.getSection() != null ? item.getSection().getId() : null
         )).collect(Collectors.toSet());
     }
 
@@ -86,20 +106,20 @@ public class ItemService {
         )).collect(Collectors.toSet());
     }
 
-    public Set<ItemDTO> getAllItems(Pageable page) {
+    public Set<ItemResponseDTO> getAllItems(Pageable page) {
         Page<Item> pageItem = repository.findAll(page);
 
         return pageItem.stream()
-                .map(this::mapToDTO)
+                .map(this::mapToResponseDTO)
                 .collect(Collectors.toSet());
     }
 
-    public ItemDTO getItemById(Long id) {
+    public ItemResponseDTO getItemById(Long id) {
         Item item = repository.findById(id).orElseThrow(() -> new RuntimeException("Item not found"));
-        return mapToDTO(item);
+        return mapToResponseDTO(item);
     }
 
-    public Set<ItemDTO> getItemsByName(String name, Pageable page) {
+    public Set<ItemResponseDTO> getItemsByName(String name, Pageable page) {
         Item item = new Item();
         item.setName(name);
 
@@ -109,7 +129,7 @@ public class ItemService {
             .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
         
         return repository.findAll(Example.of(item, matcher), page).stream()
-                .map(this::mapToDTO)
+                .map(this::mapToResponseDTO)
                 .collect(Collectors.toSet());
     }
 
@@ -118,7 +138,7 @@ public class ItemService {
         Category category = categoryRepository.findById(id).orElse(null);
 
         return new GroupedItemsResponse(
-            pageItem.stream().map(this::mapToDTO).collect(Collectors.toSet()),
+            pageItem.stream().map(this::mapToResponseDTO).collect(Collectors.toSet()),
             count(),
             category != null ? category.getName() : "Categoria"
         );
@@ -129,19 +149,19 @@ public class ItemService {
         Section section = sectionRepository.findById(id).orElse(null);
 
         return new GroupedItemsResponse(
-            pageItem.stream().map(this::mapToDTO).collect(Collectors.toSet()),
+            pageItem.stream().map(this::mapToResponseDTO).collect(Collectors.toSet()),
             count(),
             section != null ? section.getName() : "Seção"
         );
     }
 
-    public ItemDTO createItem(ItemDTO itemDTO) {
+    public ItemResponseDTO createItem(ItemDTO itemDTO) {
         Item item = mapToEntity(itemDTO);
         Item savedItem = repository.save(item);
-        return mapToDTO(savedItem);
+        return mapToResponseDTO(savedItem);
     }
 
-    public ItemDTO updateItem(Long id, ItemDTO itemDTO) {
+    public ItemResponseDTO updateItem(Long id, ItemDTO itemDTO) {
         Item item = repository.findById(id).orElseThrow(() -> new RuntimeException("Item not found"));
         item.setName(itemDTO.name());
         item.setManufacturer(itemDTO.manufacturer());
@@ -151,7 +171,7 @@ public class ItemService {
         item.setCategory(categoryRepository.findById(itemDTO.category()).orElse(null));
         item.setSection(sectionRepository.findById(itemDTO.section()).orElse(null));
         Item updatedItem = repository.save(item);
-        return mapToDTO(updatedItem);
+        return mapToResponseDTO(updatedItem);
     }
 
     public void deleteItem(Long id) {
