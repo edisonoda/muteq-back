@@ -1,6 +1,6 @@
 package com.andromeda.muteq.Entity;
 
-import java.util.Set;
+import java.util.List;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -39,5 +39,5 @@ public class Category {
     private Image image;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    private Set<Item> items;
+    private List<Item> items;
 }

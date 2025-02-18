@@ -57,7 +57,7 @@ public class CategoryService {
             category.name(),
             category.description(),
             imageRepository.findByName(category.image()).orElse(null),
-            itemRepository.findAllById(category.items()).stream().collect(Collectors.toSet())
+            itemRepository.findAllById(category.items()).stream().collect(Collectors.toList())
         );
     }
     
@@ -94,6 +94,7 @@ public class CategoryService {
 
     public CategoryDTO createCategory(CategoryDTO categoryDTO) {
         Category category = mapToEntity(categoryDTO);
+        category.getItems().forEach(item -> item.setCategory(category));
         Category savedCategory = repository.save(category);
         return mapToDTO(savedCategory);
     }
@@ -103,7 +104,10 @@ public class CategoryService {
         category.setName(categoryDTO.name());
         category.setDescription(categoryDTO.description());
         category.setImage(imageRepository.findByName(categoryDTO.image()).orElse(null));
-        category.setItems(itemRepository.findAllById(categoryDTO.items()).stream().collect(Collectors.toSet()));
+        category.setItems(itemRepository.findAllById(categoryDTO.items()).stream().map(item -> {
+            item.setCategory(category);
+            return item;
+        }).collect(Collectors.toList()));
         Category updatedCategory = repository.save(category);
         return mapToDTO(updatedCategory);
     }

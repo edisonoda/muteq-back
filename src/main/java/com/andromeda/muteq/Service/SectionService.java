@@ -57,7 +57,7 @@ public class SectionService {
             section.name(),
             section.description(),
             imageRepository.findByName(section.image()).orElse(null),
-            itemRepository.findAllById(section.items()).stream().collect(Collectors.toSet())
+            itemRepository.findAllById(section.items()).stream().collect(Collectors.toList())
         );
     }
         
@@ -94,6 +94,7 @@ public class SectionService {
 
     public SectionDTO createSection(SectionDTO sectionDTO) {
         Section section = mapToEntity(sectionDTO);
+        section.getItems().forEach(item -> item.setSection(section));
         Section savedSection = repository.save(section);
         return mapToDTO(savedSection);
     }
@@ -103,7 +104,11 @@ public class SectionService {
         section.setName(sectionDTO.name());
         section.setDescription(sectionDTO.description());
         section.setImage(imageRepository.findByName(sectionDTO.image()).orElse(null));
-        section.setItems(itemRepository.findAllById(sectionDTO.items()).stream().collect(Collectors.toSet()));
+        section.setItems(itemRepository.findAllById(sectionDTO.items()).stream().map(item -> {
+            item.setSection(section);
+            return item;
+        }).collect(Collectors.toList()));
+
         Section updatedSection = repository.save(section);
         return mapToDTO(updatedSection);
     }
